@@ -13,48 +13,50 @@ import ar.edu.unju.edm.service.imp.LoginUsuarioServiceImp;
 
 
 
-
 @Configuration
 @EnableWebSecurity
-	public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
+  @Autowired
+	private Autentication autenticacion;
 
-		@Autowired
-		private Autentication autenticacion;
-		
-		String[] resources = new String[] {
-				"/include/*","/css/","/img/","/js/","/layouts/","/webjars/", "/static/*"
-		};
-		
-		@Override
-		protected void configure(HttpSecurity http) throws Exception{
-			http
-				.authorizeRequests()
-					.antMatchers(resources).permitAll()
-					.antMatchers("/pregunta/guardar","/lista","/usuario/modificar","/usuario","/usuario/guardar","/pregunta/modificar","/pregunta").hasAuthority("Docente")
-					.antMatchers("/","/home","/index", "/login", "/registro", "/registro/guardar","/listapregs").permitAll()
-					.anyRequest().authenticated()
-					.and().formLogin()				
-					.loginPage("/login").permitAll()
-					.successHandler(autenticacion)
-					.failureUrl("/login?error=true")
-					.usernameParameter("dni")
-					.passwordParameter("password")
-					.and()
-				    .logout().permitAll();
-			        http.csrf().disable(); 
-		}
-		
-		@Bean
-	    public BCryptPasswordEncoder passwordEncoder() {
-			BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(4);
-	        return bCryptPasswordEncoder;
-	    }
-		
-		@Autowired
-	    LoginUsuarioServiceImp userDetailsService;
-	    
-	    @Autowired
-	    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {    	    	
-	    	auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-	    }
+	String[] resources = new String[] { "/include/**", "/css/**", "/icons/**", "/img/**", "/js/**", "/layer/**","/webjars/**" };
+
+  @Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http.csrf().disable()
+			.authorizeRequests()
+				.antMatchers(resources).permitAll()
+				.antMatchers("/", "/home", "/index","/usuarios/nuevo","/usuarios").permitAll()
+				.anyRequest().authenticated()
+				.and()
+			.formLogin()
+				.loginPage("/login")
+				.permitAll()
+				.successHandler(autenticacion)
+				.failureUrl("/login?error=true")
+				.usernameParameter("dni")
+				.passwordParameter("password")				
+				.and()
+			.logout()
+				.permitAll()
+				.logoutSuccessUrl("/login?logout");
+	}	
+
+	BCryptPasswordEncoder bCryptPasswordEncoder;
+
+	@Bean
+	public BCryptPasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder(4);
 	}
+
+	@Autowired
+	LoginUsuarioServiceImp userDetailsService;
+
+	@Autowired
+
+	protected void GlobalConfiguration(AuthenticationManagerBuilder authentication) throws Exception {
+    System.out.println("Inicio");
+		authentication.userDetailsService(userDetailsService);
+	}
+
+}

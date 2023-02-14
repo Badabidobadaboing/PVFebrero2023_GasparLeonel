@@ -10,96 +10,101 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 import ar.edu.unju.edm.model.Usuario;
+import ar.edu.unju.edm.service.IUsuarioPreguntaService;
 import ar.edu.unju.edm.service.IUsuarioService;
 
 @Controller
 public class UsuarioController {
 	@Autowired
 	IUsuarioService unUsuario;
-//	@Autowired
-//	IPreguntaService unaPreg;
+	@Autowired
+	Usuario usuario;
+	@Autowired
+	IUsuarioPreguntaService usuarioPreguntaService;
 	
-	@GetMapping ("/registro")
-	public String registrarUsuario(Model model) {
-		model.addAttribute("unUser", unUsuario.crearUsuario());
-		return "registro";
-	}
 	
-	@PostMapping ("/registro/guardar")
-	public String guardarUsuario(@ModelAttribute ("unUser") Usuario unUsr, Model model) {
-		unUsuario.guardarUsuario(unUsr);
-		return "redirect:/login";
-}
-	
-	@GetMapping ("/usuario")
-	public String registrarUsuarioDocente(Model model) {
-		model.addAttribute("unUser", unUsuario.crearUsuario());
-		return "usuario";
+	@GetMapping("/login")
+	public ModelAndView getlogin() {
+		ModelAndView vista = new ModelAndView("index");
+		return vista;
 	}
-	@PostMapping ("/usuario/guardar")
-	public String guardarUsuarioDocente(@ModelAttribute ("unUser") Usuario unUsr, Model model) {
-		unUsuario.guardarUsuario(unUsr);
-		return "redirect:/listaUsuarioDocente";
-}
-	@GetMapping ("usuario/editar/{dni}")
-	public String editarUsuario(Model model, @PathVariable(name="dni") String dni) throws Exception {
-		try {
-			Usuario usuarioEncontrado = unUsuario.encontrarUsuario(dni);
-			model.addAttribute("unUser", usuarioEncontrado);	
-			model.addAttribute("editMode", "true");
-		}
-		catch (Exception e) {
-			model.addAttribute("formUsuarioErrorMessage",e.getMessage());
-			model.addAttribute("unUser", unUsuario.crearUsuario());
-			model.addAttribute("editMode", "false");
-		}
-		model.addAttribute("lista", unUsuario.obtenerTodosLosUsuarios());
-		return("usuario");
-	}
-	@PostMapping ("/usuario/modificar")
-	public String modificarUsuario(@ModelAttribute ("unUser") Usuario unUsr, Model model) {
-		
-		try {
-			unUsuario.modificarUsuario(unUsr);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
-		return "redirect:/listaUsuarioDocente";
-	}
-	@GetMapping ("/usuario/eliminar/{dni}")
-	public String eliminarUsuario(Model model, @PathVariable (name="dni") String dni) {
-		
-		try {
-			unUsuario.eliminarUsuario(dni);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return "redirect:/listaUsuarioDocente";
-	}
-	@GetMapping ("/lista")
-	public String mostrarLista(Model model) throws Exception {
-		Authentication auth = SecurityContextHolder
-	            .getContext()
-	            .getAuthentication();
-	    UserDetails userDetail = (UserDetails) auth.getPrincipal();
+	@GetMapping("/")
+	public String index() {
+		return "index";
 
-		Usuario logueado = unUsuario.encontrarUsuario(userDetail.getUsername());
-		model.addAttribute("perfil", logueado);
-		model.addAttribute("lista", unUsuario.obtenerTodosLosUsuarios());
-//		model.addAttribute("listapreg", unaPreg.obtenerTodasLasPreguntas());
-		return ("mostrar");
-}
-	@GetMapping ("/listaUsuarioDocente")
-	public String mostrarListaDocente(Model model) {
-		model.addAttribute("lista", unUsuario.obtenerTodosLosUsuarios());
-		return ("tablausuario");
+	}
 
-}
-	
+	@GetMapping({ "/listarusuarios" })
+	public String listarUsuarios(Model modelo) {
+		modelo.addAttribute("usuarios", unUsuario.obtenerTodosLosUsuarios());
+		return "tabla_usuarios";
+	}
+
+	@GetMapping({ "usuarios/nuevo" })
+	public String crearUsuarioFormulario(Model modelo) {
+		Usuario usuario = new Usuario();
+		modelo.addAttribute("usuario", usuario);
+		return "crear_usuarios";
+	}
+
+	@PostMapping("/usuarios")
+	public String guardarUsuarios(@ModelAttribute("usuario") Usuario usuario) {
+		unUsuario.guardarUsuario(usuario);
+		return "redirect:/";
+	}
+
+	@GetMapping("/usuarios/editar/{id}")
+	public String mostrarFormularioDeEditar(@PathVariable Long id, Model modelo) {
+		modelo.addAttribute("usuario", unUsuario.encontrarUsuario(id));
+		return "editar_usuario";
+	}
+
+	@PostMapping("/usuarios/{id}")
+	public String actualizarUsuarios(@PathVariable Long id, @ModelAttribute("usuario") Usuario usuario, Model modelo) {
+		Usuario usuarioExistente = unUsuario.encontrarUsuario(id);
+		usuarioExistente.setDni(id);
+		usuarioExistente.setNombre(usuario.getNombre());
+		usuarioExistente.setApellido(usuario.getApellido());
+		unUsuario.modificarUsuario(usuarioExistente);
+		return "redirect:/listarusuarios";
+	}
+
+	@GetMapping("/usuarios/eliminar/{id}")
+	public String eliminarUsuario(@PathVariable Long id) {
+		unUsuario.eliminarUsuario(id);
+		System.out.println("Eliminado");
+		return "redirect:/listarusuarios";
+	}
+
+	@GetMapping("/vernota1")
+	public String vernota(Model modelo) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		UserDetails userDetail = (UserDetails) auth.getPrincipal();
+		modelo.addAttribute("puntaje", usuarioPreguntaService
+				.SumarPuntaje(usuarioPreguntaService.buscarIdUsuario(Long.parseLong(userDetail.getUsername()), 1)));
+		return "resultados_estudiante";
+	}
+
+	@GetMapping("/vernota2")
+	public String vernota2(Model modelo) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		UserDetails userDetail = (UserDetails) auth.getPrincipal();
+		modelo.addAttribute("puntaje", usuarioPreguntaService
+				.SumarPuntaje(usuarioPreguntaService.buscarIdUsuario(Long.parseLong(userDetail.getUsername()), 2)));
+		return "resultados_estudiante";
+	}
+
+	@GetMapping("/vernota/{id}")
+	public String vernotadocente(Model modelo, @PathVariable Long id) {
+		Usuario aux = new Usuario();
+		aux = unUsuario.encontrarUsuario(id);
+		modelo.addAttribute("puntaje",
+				usuarioPreguntaService.SumarPuntaje(usuarioPreguntaService.buscarIdUsuario(aux.getDni(), 1)));
+		return "resultados_docente";
+	}
 
 }

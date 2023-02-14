@@ -16,11 +16,11 @@ public class Pregunta {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column
-	private int codPregunta;
+	private Long codPregunta;
 	@Column
 	private String enunciado;
 	@Column
-	private int nivel;
+	private Integer nivel;
 	@Column
 	private String opcion01;
 	@Column
@@ -28,18 +28,18 @@ public class Pregunta {
 	@Column
 	private String opcion03;
 	@Column
-	private String opcion04;
-	@Column
 	private String opcionCorrecta;
 	@Column
-	private int Puntaje;
+	private Integer Puntaje;
+	@Column
+	private Boolean estado;
 	
 	public Pregunta() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Pregunta(int codPregunta, String enunciado, int nivel, String opcion01, String opcion02, String opcion03,
-			String opcion04, String opcionCorrecta, int puntaje) {
+	public Pregunta(Long codPregunta, String enunciado, Integer nivel, String opcion01, String opcion02,
+			String opcion03, String opcionCorrecta, Integer puntaje, Boolean estado) {
 		super();
 		this.codPregunta = codPregunta;
 		this.enunciado = enunciado;
@@ -47,16 +47,16 @@ public class Pregunta {
 		this.opcion01 = opcion01;
 		this.opcion02 = opcion02;
 		this.opcion03 = opcion03;
-		this.opcion04 = opcion04;
 		this.opcionCorrecta = opcionCorrecta;
 		Puntaje = puntaje;
+		this.estado = estado;
 	}
 
-	public int getCodPregunta() {
+	public Long getCodPregunta() {
 		return codPregunta;
 	}
 
-	public void setCodPregunta(int codPregunta) {
+	public void setCodPregunta(Long codPregunta) {
 		this.codPregunta = codPregunta;
 	}
 
@@ -68,11 +68,11 @@ public class Pregunta {
 		this.enunciado = enunciado;
 	}
 
-	public int getNivel() {
+	public Integer getNivel() {
 		return nivel;
 	}
 
-	public void setNivel(int nivel) {
+	public void setNivel(Integer nivel) {
 		this.nivel = nivel;
 	}
 
@@ -100,14 +100,6 @@ public class Pregunta {
 		this.opcion03 = opcion03;
 	}
 
-	public String getOpcion04() {
-		return opcion04;
-	}
-
-	public void setOpcion04(String opcion04) {
-		this.opcion04 = opcion04;
-	}
-
 	public String getOpcionCorrecta() {
 		return opcionCorrecta;
 	}
@@ -116,15 +108,22 @@ public class Pregunta {
 		this.opcionCorrecta = opcionCorrecta;
 	}
 
-	public int getPuntaje() {
+	public Integer getPuntaje() {
 		return Puntaje;
 	}
 
-	public void setPuntaje(int puntaje) {
+	public void setPuntaje(Integer puntaje) {
 		Puntaje = puntaje;
 	}
-	
-	
+
+	public Boolean getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Boolean estado) {
+		this.estado = estado;
+	}
+
 	
 
 }

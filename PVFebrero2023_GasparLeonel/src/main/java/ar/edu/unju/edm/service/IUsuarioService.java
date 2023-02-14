@@ -10,10 +10,9 @@ import ar.edu.unju.edm.model.Usuario;
 public interface IUsuarioService {
 	
 	public void guardarUsuario(Usuario unUsuario);
-	public void modificarUsuario(Usuario unUsuario) throws Exception;
-	public Usuario crearUsuario();
-	public Usuario encontrarUsuario(String dni) throws Exception;
+	public void modificarUsuario(Usuario unUsuario);
+	public Usuario encontrarUsuario(Long id);
 	public List<Usuario> obtenerTodosLosUsuarios();
-	public void eliminarUsuario(String dni) throws Exception;
+	public void eliminarUsuario(Long id);
 
 }

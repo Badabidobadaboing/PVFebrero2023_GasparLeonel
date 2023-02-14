@@ -1,5 +1,6 @@
 package ar.edu.unju.edm.service.imp;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,58 +14,51 @@ import ar.edu.unju.edm.service.IUsuarioService;
 @Service
 public class UsuarioServiceImp implements IUsuarioService{
 	@Autowired
-	Usuario unUsuario;
-	@Autowired
-	IUsuarioDao usuarioDAO;
+	private IUsuarioDao usuarioRepo;
 	
-	public void modUsuario(Usuario desde, Usuario hacia) {
-		hacia.setApellido(desde.getApellido());
-		hacia.setNombre(desde.getNombre());
-		hacia.setTipoUsuario(desde.getTipoUsuario());
-		hacia.setFechaNac(desde.getFechaNac());
-		
-	}
-
 	@Override
 	public void guardarUsuario(Usuario unUsuario) {
 		// TODO Auto-generated method stub
 		String pasw = unUsuario.getPassword();
 		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(4);
 		unUsuario.setPassword(bCryptPasswordEncoder.encode(pasw));
-		usuarioDAO.save(unUsuario);
+		unUsuario.setEstado(true);
+		usuarioRepo.save(unUsuario);
 	}
 
 	@Override
-	public void modificarUsuario(Usuario unUsuario) throws Exception {
+	public void modificarUsuario(Usuario unUsuario){
 		// TODO Auto-generated method stub
-		Usuario usuarioParaModificar = usuarioDAO.findById(unUsuario.getDni()).orElseThrow(()->new Exception("El usuario no fue encontrado"));
-		modUsuario(unUsuario, usuarioParaModificar);
-		usuarioDAO.save(usuarioParaModificar);
+		usuarioRepo.save(unUsuario);
 	}
 
 	@Override
-	public Usuario crearUsuario() {
+	public Usuario encontrarUsuario(Long id){
 		// TODO Auto-generated method stub
-		return unUsuario;
-	}
-
-	@Override
-	public Usuario encontrarUsuario(String dni) throws Exception {
-		// TODO Auto-generated method stub
-		return usuarioDAO.findById(dni).orElseThrow(()->new Exception("El usuario no fue encontrado"));
+		return usuarioRepo.findById(id).get();
 	}
 
 	@Override
 	public List<Usuario> obtenerTodosLosUsuarios() {
 		// TODO Auto-generated method stub
-		return (List<Usuario>) usuarioDAO.findAll();
+		List<Usuario> auxiliar = new ArrayList<>();
+		List<Usuario> auxiliar2 = new ArrayList<>();
+		auxiliar=(List<Usuario>) usuarioRepo.findAll();
+		for (int i = 0; i < auxiliar.size(); i++) {
+			if(auxiliar.get(i).getEstado().equals(true)) {
+				auxiliar2.add(auxiliar.get(i));
+			}			
+		}
+		return auxiliar2;
 	}
 
 	@Override
-	public void eliminarUsuario(String dni) throws Exception {
+	public void eliminarUsuario(Long id){
 		// TODO Auto-generated method stub
-		Usuario usuarioParaEliminar = usuarioDAO.findById(dni).orElseThrow(()->new Exception("El usuario no fue encontrado"));
-		usuarioDAO.delete(usuarioParaEliminar);
+		Usuario auxiliar = new Usuario();
+		auxiliar = encontrarUsuario(id);
+		auxiliar.setEstado(false);
+		usuarioRepo.save(auxiliar);
 	}
 
 }

@@ -21,12 +21,12 @@ IUsuarioService unUser;
 	@Override
 	public void run(String... args) throws Exception {
 		// TODO Auto-generated method stub
-		unUsuario.setDni("44877776");
-		unUsuario.setApellido("Gaspar");
-		unUsuario.setNombre("Leonel Alejandro");
-		unUsuario.setPassword("Boing123");
-		unUsuario.setTipoUsuario("Docente");
-		unUser.guardarUsuario(unUsuario);
+		//unUsuario.setDni("44877776");
+		//unUsuario.setApellido("Gaspar");
+		//unUsuario.setNombre("Leonel Alejandro");
+		//unUsuario.setPassword("Boing123");
+		//unUsuario.setTipoUsuario("Docente");
+		//unUser.guardarUsuario(unUsuario);
 	}
 
 }

@@ -7,7 +7,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import ar.edu.unju.edm.model.Usuario;
 
-public interface IUsuarioDao extends CrudRepository <Usuario, String>{
+public interface IUsuarioDao extends CrudRepository <Usuario, Long>{
 	@Query("from Usuario c order by c.dni")
 	public List<Usuario> obtenerUsuario();
 
